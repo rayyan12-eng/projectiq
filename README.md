@@ -1,5 +1,7 @@
 # ProjectIQ — Agentic AI Construction Project Risk Assistant
 
+https://projectiq-risk.fly.dev/
+
 An agentic AI assistant for construction/contracting companies. Given a project's
 planning-stage details (size, budget, suppliers, subcontractors, site conditions),
 it predicts likely cost overrun and schedule delay risk, and can pull comparable
