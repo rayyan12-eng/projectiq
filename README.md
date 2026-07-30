@@ -103,3 +103,13 @@ CSV `ml/train_model.py` reads from - the training and serving code doesn't chang
   or a real bill-of-quantities breakdown.
 - The risk model's cost/delay outputs are point estimates without a formal confidence
   interval - in production this would warrant a proper uncertainty quantification method.
+
+
+  <img width="1392" height="127" alt="image" src="https://github.com/user-attachments/assets/2780f476-5e92-4da7-9aeb-770c85cf585f" />
+  <img width="1572" height="276" alt="image" src="https://github.com/user-attachments/assets/9d3df1bb-a9ac-4939-b48c-f7254940e624" />
+  <img width="1576" height="262" alt="image" src="https://github.com/user-attachments/assets/e45ba6a9-621f-4733-9ff9-251cecc90494" />
+  
+
+
+  
+
