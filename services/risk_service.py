@@ -14,12 +14,22 @@ import joblib
 import numpy as np
 import tensorflow as tf
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 MODEL_DIR = os.path.join(os.path.dirname(HERE), "ml", "model")
 
 app = FastAPI(title="ProjectIQ Risk Service", version="1.0.0")
+
+# Allows the standalone frontend (opened as a local file or hosted separately,
+# e.g. GitHub Pages) to call this API cross-origin.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 _model = None
 _preprocessor = None
