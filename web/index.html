@@ -4,9 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ProjectIQ — Risk Assessment</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders:wght@600;800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
     --paper:#EDE8DA;
@@ -26,7 +23,7 @@
   body{
     background:var(--paper);
     color:var(--ink);
-    font-family:'IBM Plex Sans', sans-serif;
+    font-family:'Segoe UI', Roboto, Arial, sans-serif;
     -webkit-font-smoothing:antialiased;
     min-height:100vh;
   }
@@ -50,7 +47,7 @@
   }
   .titleblock .cell:last-child{ border-right:none; }
   .tb-label{
-    font-family:'IBM Plex Mono', monospace;
+    font-family:'Consolas', 'SF Mono', 'Courier New', monospace;
     font-size:10px;
     letter-spacing:.12em;
     text-transform:uppercase;
@@ -59,7 +56,7 @@
   }
   .tb-value{
     margin:0;
-    font-family:'Big Shoulders', sans-serif;
+    font-family:'Arial Narrow', 'Archivo Narrow', Impact, sans-serif;
     font-weight:800;
     font-size:30px;
     line-height:1;
@@ -98,7 +95,7 @@
     border-bottom:2px solid var(--ink);
   }
   .panel-head h2{
-    font-family:'Big Shoulders', sans-serif;
+    font-family:'Arial Narrow', 'Archivo Narrow', Impact, sans-serif;
     font-weight:800;
     font-size:20px;
     letter-spacing:.04em;
@@ -106,7 +103,7 @@
     margin:0;
   }
   .panel-head .tag{
-    font-family:'IBM Plex Mono', monospace;
+    font-family:'Consolas', 'SF Mono', 'Courier New', monospace;
     font-size:10px;
     letter-spacing:.1em;
     color:#6b6552;
@@ -117,7 +114,7 @@
   .field{ margin-bottom:16px; }
   .field label{
     display:block;
-    font-family:'IBM Plex Mono', monospace;
+    font-family:'Consolas', 'SF Mono', 'Courier New', monospace;
     font-size:11px;
     letter-spacing:.06em;
     text-transform:uppercase;
@@ -125,7 +122,7 @@
     margin-bottom:6px;
   }
   .field .hint{
-    font-family:'IBM Plex Sans', sans-serif;
+    font-family:'Segoe UI', Roboto, Arial, sans-serif;
     text-transform:none;
     letter-spacing:0;
     font-size:11px;
@@ -134,7 +131,7 @@
   }
   .field input, .field select{
     width:100%;
-    font-family:'IBM Plex Mono', monospace;
+    font-family:'Consolas', 'SF Mono', 'Courier New', monospace;
     font-size:14px;
     padding:9px 10px;
     border:1.5px solid var(--ink);
@@ -154,7 +151,7 @@
     background:var(--navy);
     color:var(--paper);
     border:none;
-    font-family:'Big Shoulders', sans-serif;
+    font-family:'Arial Narrow', 'Archivo Narrow', Impact, sans-serif;
     font-weight:800;
     font-size:18px;
     letter-spacing:.05em;
@@ -172,13 +169,13 @@
     align-items:center;
     padding:10px 18px;
     border-top:1px solid var(--line);
-    font-family:'IBM Plex Mono', monospace;
+    font-family:'Consolas', 'SF Mono', 'Courier New', monospace;
     font-size:11px;
     color:#6b6552;
   }
   .endpoint-row input{
     flex:1;
-    font-family:'IBM Plex Mono', monospace;
+    font-family:'Consolas', 'SF Mono', 'Courier New', monospace;
     font-size:11px;
     padding:5px 7px;
     border:1px solid var(--line);
@@ -211,7 +208,7 @@
     z-index:1;
     text-align:center;
     color:var(--cyan);
-    font-family:'IBM Plex Mono', monospace;
+    font-family:'Consolas', 'SF Mono', 'Courier New', monospace;
     font-size:13px;
     letter-spacing:.08em;
     text-transform:uppercase;
@@ -220,7 +217,7 @@
   }
   .placeholder .big{
     display:block;
-    font-family:'Big Shoulders', sans-serif;
+    font-family:'Arial Narrow', 'Archivo Narrow', Impact, sans-serif;
     font-size:15px;
     color:#fff;
     margin-bottom:10px;
@@ -245,7 +242,7 @@
     padding:14px 16px;
   }
   .stat .k{
-    font-family:'IBM Plex Mono', monospace;
+    font-family:'Consolas', 'SF Mono', 'Courier New', monospace;
     font-size:10px;
     letter-spacing:.1em;
     text-transform:uppercase;
@@ -253,7 +250,7 @@
     margin:0 0 4px;
   }
   .stat .v{
-    font-family:'Big Shoulders', sans-serif;
+    font-family:'Arial Narrow', 'Archivo Narrow', Impact, sans-serif;
     font-weight:800;
     font-size:24px;
     margin:0;
@@ -269,7 +266,7 @@
   .stamp{
     border:5px solid var(--risk-c, var(--risk-green));
     color:var(--risk-c, var(--risk-green));
-    font-family:'Big Shoulders', sans-serif;
+    font-family:'Arial Narrow', 'Archivo Narrow', Impact, sans-serif;
     font-weight:800;
     font-size:30px;
     letter-spacing:.06em;
@@ -284,7 +281,7 @@
   }
   .stamp small{
     display:block;
-    font-family:'IBM Plex Mono', monospace;
+    font-family:'Consolas', 'SF Mono', 'Courier New', monospace;
     font-weight:500;
     font-size:11px;
     letter-spacing:.1em;
@@ -304,7 +301,7 @@
     margin-top:16px;
     font-size:12.5px;
     color:#cfe6f2;
-    font-family:'IBM Plex Mono', monospace;
+    font-family:'Consolas', 'SF Mono', 'Courier New', monospace;
     line-height:1.6;
     padding-top:14px;
     border-top:1px dashed rgba(255,255,255,.25);
@@ -313,7 +310,7 @@
   .error-box{
     position:relative; z-index:1;
     color:#ffd9d3;
-    font-family:'IBM Plex Mono', monospace;
+    font-family:'Consolas', 'SF Mono', 'Courier New', monospace;
     font-size:12.5px;
     text-align:center;
     max-width:36ch;
@@ -321,7 +318,7 @@
 
   footer{
     margin-top:26px;
-    font-family:'IBM Plex Mono', monospace;
+    font-family:'Consolas', 'SF Mono', 'Courier New', monospace;
     font-size:11px;
     color:#8a836a;
     text-align:center;
