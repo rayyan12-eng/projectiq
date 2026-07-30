@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ProjectIQ — Risk Assessment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders:wght@600;800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EDE8DA;
+    --paper-dark:#E3DCC8;
+    --navy:#16233F;
+    --navy-light:#233459;
+    --cyan:#7EC8E3;
+    --ink:#1C1C1A;
+    --amber:#E2A63D;
+    --risk-red:#B33A2E;
+    --risk-amber:#C98A2C;
+    --risk-green:#3F7A54;
+    --line:#B9B29A;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+  .wrap{
+    max-width:1160px;
+    margin:0 auto;
+    padding:28px 20px 60px;
+  }
+
+  /* ---- Title block, styled after an engineering drawing title block ---- */
+  .titleblock{
+    border:2px solid var(--ink);
+    display:grid;
+    grid-template-columns: 1.6fr 1fr 1fr;
+    background:var(--paper);
+    margin-bottom:28px;
+  }
+  .titleblock .cell{
+    border-right:1px solid var(--ink);
+    padding:14px 18px;
+  }
+  .titleblock .cell:last-child{ border-right:none; }
+  .tb-label{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:#6b6552;
+    margin:0 0 4px;
+  }
+  .tb-value{
+    margin:0;
+    font-family:'Big Shoulders', sans-serif;
+    font-weight:800;
+    font-size:30px;
+    line-height:1;
+    letter-spacing:.01em;
+    color:var(--navy);
+  }
+  .tb-sub{
+    margin:6px 0 0;
+    font-size:13px;
+    color:#4a4636;
+    max-width:46ch;
+  }
+  .tb-meta-row{ display:flex; justify-content:space-between; align-items:baseline; }
+  .tb-meta-row .tb-value{ font-size:20px; }
+
+  /* ---- Two column layout ---- */
+  .grid{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:22px;
+  }
+  @media (max-width: 860px){
+    .grid{ grid-template-columns: 1fr; }
+  }
+
+  .panel{
+    border:2px solid var(--ink);
+    background:var(--paper);
+    position:relative;
+  }
+  .panel-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:12px 18px;
+    border-bottom:2px solid var(--ink);
+  }
+  .panel-head h2{
+    font-family:'Big Shoulders', sans-serif;
+    font-weight:800;
+    font-size:20px;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    margin:0;
+  }
+  .panel-head .tag{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10px;
+    letter-spacing:.1em;
+    color:#6b6552;
+  }
+  .panel-body{ padding:20px 18px 24px; }
+
+  /* ---- Form ---- */
+  .field{ margin-bottom:16px; }
+  .field label{
+    display:block;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:#4a4636;
+    margin-bottom:6px;
+  }
+  .field .hint{
+    font-family:'IBM Plex Sans', sans-serif;
+    text-transform:none;
+    letter-spacing:0;
+    font-size:11px;
+    color:#8a836a;
+    margin-left:6px;
+  }
+  .field input, .field select{
+    width:100%;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:14px;
+    padding:9px 10px;
+    border:1.5px solid var(--ink);
+    background:#fff;
+    color:var(--ink);
+  }
+  .field input:focus, .field select:focus{
+    outline:3px solid var(--cyan);
+    outline-offset:0;
+  }
+  .row2{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+
+  .submit-btn{
+    width:100%;
+    margin-top:6px;
+    padding:14px 16px;
+    background:var(--navy);
+    color:var(--paper);
+    border:none;
+    font-family:'Big Shoulders', sans-serif;
+    font-weight:800;
+    font-size:18px;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    cursor:pointer;
+    transition:background .15s ease;
+  }
+  .submit-btn:hover{ background:var(--navy-light); }
+  .submit-btn:disabled{ background:#948d78; cursor:progress; }
+  .submit-btn:focus-visible{ outline:3px solid var(--cyan); outline-offset:2px; }
+
+  .endpoint-row{
+    display:flex;
+    gap:8px;
+    align-items:center;
+    padding:10px 18px;
+    border-top:1px solid var(--line);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    color:#6b6552;
+  }
+  .endpoint-row input{
+    flex:1;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    padding:5px 7px;
+    border:1px solid var(--line);
+    background:#fff;
+  }
+
+  /* ---- Report panel (blueprint grid background) ---- */
+  .report-body{
+    min-height:420px;
+    background-image:
+      linear-gradient(var(--cyan) 1px, transparent 1px),
+      linear-gradient(90deg, var(--cyan) 1px, transparent 1px);
+    background-size:24px 24px;
+    background-color:var(--navy);
+    background-blend-mode:normal;
+    position:relative;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    overflow:hidden;
+  }
+  .report-body::before{
+    content:"";
+    position:absolute; inset:0;
+    background:rgba(22,35,63,0.86);
+  }
+  .placeholder{
+    position:relative;
+    z-index:1;
+    text-align:center;
+    color:var(--cyan);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    max-width:32ch;
+    opacity:.85;
+  }
+  .placeholder .big{
+    display:block;
+    font-family:'Big Shoulders', sans-serif;
+    font-size:15px;
+    color:#fff;
+    margin-bottom:10px;
+    letter-spacing:.05em;
+  }
+
+  .result{
+    position:relative;
+    z-index:1;
+    width:100%;
+    color:#fff;
+  }
+  .result-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:2px;
+    background:rgba(255,255,255,.14);
+    border:1px solid rgba(255,255,255,.25);
+  }
+  .stat{
+    background:var(--navy);
+    padding:14px 16px;
+  }
+  .stat .k{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--cyan);
+    margin:0 0 4px;
+  }
+  .stat .v{
+    font-family:'Big Shoulders', sans-serif;
+    font-weight:800;
+    font-size:24px;
+    margin:0;
+    color:#fff;
+  }
+
+  /* ---- Inspection stamp ---- */
+  .stamp-wrap{
+    display:flex;
+    justify-content:center;
+    margin:22px 0 16px;
+  }
+  .stamp{
+    border:5px solid var(--risk-c, var(--risk-green));
+    color:var(--risk-c, var(--risk-green));
+    font-family:'Big Shoulders', sans-serif;
+    font-weight:800;
+    font-size:30px;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    padding:10px 26px;
+    border-radius:8px;
+    transform:rotate(-6deg) scale(0.6);
+    opacity:0;
+    animation:stampIn .38s cubic-bezier(.2,1.6,.4,1) forwards;
+    background:rgba(255,255,255,.04);
+    text-align:center;
+  }
+  .stamp small{
+    display:block;
+    font-family:'IBM Plex Mono', monospace;
+    font-weight:500;
+    font-size:11px;
+    letter-spacing:.1em;
+    margin-top:4px;
+  }
+  @keyframes stampIn{
+    0%{ opacity:0; transform:rotate(-6deg) scale(0.5); }
+    60%{ opacity:1; transform:rotate(-6deg) scale(1.08); }
+    100%{ opacity:1; transform:rotate(-6deg) scale(1); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .stamp{ animation:none; opacity:1; transform:rotate(-6deg) scale(1); }
+  }
+
+  .reasoning{
+    position:relative; z-index:1;
+    margin-top:16px;
+    font-size:12.5px;
+    color:#cfe6f2;
+    font-family:'IBM Plex Mono', monospace;
+    line-height:1.6;
+    padding-top:14px;
+    border-top:1px dashed rgba(255,255,255,.25);
+  }
+
+  .error-box{
+    position:relative; z-index:1;
+    color:#ffd9d3;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12.5px;
+    text-align:center;
+    max-width:36ch;
+  }
+
+  footer{
+    margin-top:26px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    color:#8a836a;
+    text-align:center;
+  }
+  footer a{ color:var(--navy); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="titleblock">
+    <div class="cell">
+      <p class="tb-label">Project</p>
+      <p class="tb-value">PROJECTIQ</p>
+      <p class="tb-sub">Agentic AI cost &amp; schedule risk assessment for construction bids</p>
+    </div>
+    <div class="cell">
+      <div class="tb-meta-row">
+        <p class="tb-label">Sheet</p>
+        <p class="tb-value">01</p>
+      </div>
+      <p class="tb-sub">Risk intake &amp; report</p>
+    </div>
+    <div class="cell">
+      <div class="tb-meta-row">
+        <p class="tb-label">Rev</p>
+        <p class="tb-value">A</p>
+      </div>
+      <p class="tb-sub">TensorFlow model · live inference</p>
+    </div>
+  </div>
+
+  <div class="grid">
+
+    <!-- LEFT: intake form -->
+    <div class="panel">
+      <div class="panel-head">
+        <h2>Project Intake</h2>
+        <span class="tag">FORM 01-R</span>
+      </div>
+      <div class="panel-body">
+        <form id="riskForm">
+          <div class="field">
+            <label for="project_type">Project type</label>
+            <select id="project_type">
+              <option>Residential</option>
+              <option>Commercial</option>
+              <option>Industrial</option>
+              <option>Infrastructure</option>
+            </select>
+          </div>
+
+          <div class="row2">
+            <div class="field">
+              <label for="size_sqm">Size <span class="hint">sqm</span></label>
+              <input type="number" id="size_sqm" value="3000" min="1">
+            </div>
+            <div class="field">
+              <label for="planned_duration_days">Planned duration <span class="hint">days</span></label>
+              <input type="number" id="planned_duration_days" value="180" min="1">
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="planned_budget_aed">Planned budget <span class="hint">AED</span></label>
+            <input type="number" id="planned_budget_aed" value="5400000" min="1">
+          </div>
+
+          <div class="row2">
+            <div class="field">
+              <label for="num_suppliers">Suppliers <span class="hint">count</span></label>
+              <input type="number" id="num_suppliers" value="8" min="0">
+            </div>
+            <div class="field">
+              <label for="supplier_reliability_score">Supplier reliability <span class="hint">0–1</span></label>
+              <input type="number" id="supplier_reliability_score" value="0.7" min="0" max="1" step="0.05">
+            </div>
+          </div>
+
+          <div class="row2">
+            <div class="field">
+              <label for="num_subcontractors">Subcontractors <span class="hint">count</span></label>
+              <input type="number" id="num_subcontractors" value="4" min="0">
+            </div>
+            <div class="field">
+              <label for="design_change_orders">Design change orders <span class="hint">count</span></label>
+              <input type="number" id="design_change_orders" value="3" min="0">
+            </div>
+          </div>
+
+          <div class="row2">
+            <div class="field">
+              <label for="site_congestion_score">Site congestion <span class="hint">0–1</span></label>
+              <input type="number" id="site_congestion_score" value="0.5" min="0" max="1" step="0.05">
+            </div>
+            <div class="field">
+              <label for="permit_delay_days">Permit delay <span class="hint">days so far</span></label>
+              <input type="number" id="permit_delay_days" value="7" min="0">
+            </div>
+          </div>
+
+          <button type="submit" class="submit-btn" id="submitBtn">Run risk assessment</button>
+        </form>
+      </div>
+      <div class="endpoint-row">
+        <span>API&nbsp;&rarr;</span>
+        <input type="text" id="apiBase" value="https://projectiq-risk.fly.dev">
+      </div>
+    </div>
+
+    <!-- RIGHT: report -->
+    <div class="panel">
+      <div class="panel-head">
+        <h2>Risk Report</h2>
+        <span class="tag">OUTPUT 01-R</span>
+      </div>
+      <div class="report-body" id="reportBody">
+        <div class="placeholder" id="placeholderMsg">
+          <span class="big">Awaiting project data</span>
+          Fill in the intake form and run the assessment to generate a report.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    ProjectIQ — TensorFlow risk model + Claude agentic tool-use, containerized &amp; deployed via CI/CD.
+    <br>Trained on synthetic project data · <a href="https://github.com/rayyan12-eng/projectiq" target="_blank" rel="noopener">source on GitHub</a>
+  </footer>
+
+</div>
+
+<script>
+const form = document.getElementById('riskForm');
+const submitBtn = document.getElementById('submitBtn');
+const reportBody = document.getElementById('reportBody');
+const apiBaseInput = document.getElementById('apiBase');
+
+const RISK_COLORS = { Low: '#3F7A54', Medium: '#C98A2C', High: '#B33A2E' };
+
+function num(id){ return parseFloat(document.getElementById(id).value); }
+
+function renderPlaceholder(){
+  reportBody.innerHTML = `
+    <div class="placeholder">
+      <span class="big">Awaiting project data</span>
+      Fill in the intake form and run the assessment to generate a report.
+    </div>`;
+}
+
+function renderError(msg){
+  reportBody.innerHTML = `
+    <div class="error-box">
+      <strong>ASSESSMENT FAILED</strong><br><br>${msg}
+    </div>`;
+}
+
+function renderResult(data){
+  const color = RISK_COLORS[data.risk_level] || '#7EC8E3';
+  reportBody.innerHTML = `
+    <div class="result">
+      <div class="stamp-wrap">
+        <div class="stamp" style="--risk-c:${color}">
+          ${data.risk_level} RISK
+          <small>Assessment stamped</small>
+        </div>
+      </div>
+      <div class="result-grid">
+        <div class="stat">
+          <p class="k">Cost overrun</p>
+          <p class="v">${data.predicted_cost_overrun_pct.toFixed(1)}%</p>
+        </div>
+        <div class="stat">
+          <p class="k">Schedule delay</p>
+          <p class="v">${data.predicted_delay_days.toFixed(0)} d</p>
+        </div>
+        <div class="stat">
+          <p class="k">Est. final cost</p>
+          <p class="v">${Math.round(data.predicted_final_cost_aed).toLocaleString()} AED</p>
+        </div>
+        <div class="stat">
+          <p class="k">Est. final duration</p>
+          <p class="v">${data.predicted_final_duration_days.toFixed(0)} d</p>
+        </div>
+      </div>
+      <div class="reasoning">
+        Model output from a TensorFlow regression trained on synthetic project data.
+        Treat this as a planning-stage signal, not a guarantee — validate against real
+        historical projects before using it for bid decisions.
+      </div>
+    </div>`;
+}
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const base = apiBaseInput.value.trim().replace(/\/$/, '');
+
+  const payload = {
+    project_type: document.getElementById('project_type').value,
+    size_sqm: num('size_sqm'),
+    planned_budget_aed: num('planned_budget_aed'),
+    planned_duration_days: num('planned_duration_days'),
+    num_suppliers: num('num_suppliers'),
+    supplier_reliability_score: num('supplier_reliability_score'),
+    num_subcontractors: num('num_subcontractors'),
+    design_change_orders: num('design_change_orders'),
+    site_congestion_score: num('site_congestion_score'),
+    permit_delay_days: num('permit_delay_days'),
+  };
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Assessing…';
+  reportBody.innerHTML = `<div class="placeholder"><span class="big">Running assessment</span>Contacting the risk model…</div>`;
+
+  try {
+    const resp = await fetch(`${base}/predict`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    if (!resp.ok) {
+      const text = await resp.text();
+      throw new Error(`${resp.status} — ${text}`);
+    }
+    const data = await resp.json();
+    renderResult(data);
+  } catch (err) {
+    renderError(err.message || 'Could not reach the API. Check the endpoint above and try again.');
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Run risk assessment';
+  }
+});
+</script>
+</body>
+</html>
