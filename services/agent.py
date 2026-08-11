@@ -23,9 +23,11 @@ RISK_SERVICE_URL = os.environ.get("RISK_SERVICE_URL", "http://localhost:8002")
 SYSTEM_PROMPT = """You are ProjectIQ, a construction project risk advisor for a contracting company.
 
 You have tools to: get an ML-based cost overrun / schedule delay risk prediction for a project,
-look up comparable past projects, estimate material costs, and pull supplier reliability stats.
-Use as many tools as needed - typically a risk prediction, then comparables and/or supplier stats
-to sanity-check it, and a material cost estimate if the user is scoping a bid - before answering.
+look up comparable past projects, estimate material costs, pull supplier reliability stats, and
+run a semantic similarity search over past projects using vector embeddings. Use as many tools
+as needed - typically a risk prediction, then comparables and/or supplier stats to sanity-check
+it, and a material cost estimate if the user is scoping a bid - before answering. Use the semantic
+search tool for fuzzy, descriptive queries that don't map to exact type/size filters.
 
 Always ground your recommendation in the actual tool outputs (cite the numbers). Be direct about
 uncertainty - the risk model gives an estimate, not a guarantee. Keep the final answer concise
@@ -91,6 +93,23 @@ TOOL_DEFINITIONS = [
             "properties": {"min_reliability": {"type": "number", "default": 0.0}},
         },
     },
+    {
+        "name": "find_similar_projects_semantic",
+        "description": (
+            "Semantic-style search over past projects using vector embeddings and cosine similarity - "
+            "use this for fuzzy, descriptive queries (e.g. 'a congested urban site with unreliable "
+            "suppliers and lots of change orders') that don't map cleanly to get_comparable_projects' "
+            "exact type/size filters."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "query_text": {"type": "string", "description": "Free-text description of the kind of project to find"},
+                "top_k": {"type": "integer", "default": 5},
+            },
+            "required": ["query_text"],
+        },
+    },
 ]
 
 
@@ -109,6 +128,8 @@ def _execute_tool(name: str, args: dict) -> dict:
         return tools.estimate_material_costs(**args)
     if name == "get_supplier_reliability_stats":
         return tools.get_supplier_reliability_stats(**args)
+    if name == "find_similar_projects_semantic":
+        return {"similar_projects": tools.find_similar_projects_semantic(**args)}
     raise ValueError(f"Unknown tool: {name}")
 
 

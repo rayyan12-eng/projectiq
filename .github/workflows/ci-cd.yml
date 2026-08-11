@@ -31,6 +31,9 @@ jobs:
       - name: Train model
         run: python ml/train_model.py
 
+      - name: Build TF-IDF project embeddings
+        run: python ml/build_embeddings.py
+
       - name: Run test suite
         run: python -m pytest tests/ -v
 
@@ -55,6 +58,9 @@ jobs:
 
       - name: Train model
         run: python ml/train_model.py
+
+      - name: Build TF-IDF project embeddings
+        run: python ml/build_embeddings.py
 
       - name: Check model does not regress past acceptable error
         run: python ml/check_model_quality.py
@@ -82,7 +88,7 @@ jobs:
           python-version: "3.12"
           cache: "pip"
 
-      - name: Install dependencies
+      - name: Install dependencies (needed to regenerate the dataset)
         run: pip install -r requirements.txt
 
       - name: Regenerate dataset CSV

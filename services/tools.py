@@ -5,9 +5,14 @@ database in production.
 """
 from __future__ import annotations
 
+import os
+
+import joblib
 import pandas as pd
 
 _DATA_PATH = None
+_EMBEDDINGS_PATH = None
+_embeddings_cache = None
 
 
 def _load_dataset():
@@ -75,3 +80,50 @@ def get_supplier_reliability_stats(min_reliability: float = 0.0) -> dict:
         "median_cost_overrun_pct": round(float(subset["cost_overrun_pct"].median()), 2),
         "median_delay_days": round(float(subset["delay_days"].median()), 1),
     }
+
+
+def _load_embeddings():
+    """Lazily load the TF-IDF vectorizer + project vectors built by ml/build_embeddings.py."""
+    global _EMBEDDINGS_PATH, _embeddings_cache
+    if _embeddings_cache is None:
+        if _EMBEDDINGS_PATH is None:
+            _EMBEDDINGS_PATH = os.path.join(
+                os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                "ml", "model", "project_embeddings.joblib",
+            )
+        _embeddings_cache = joblib.load(_EMBEDDINGS_PATH)
+    return _embeddings_cache
+
+
+def find_similar_projects_semantic(query_text: str, top_k: int = 5) -> list[dict]:
+    """
+    Semantic-style similarity search over past projects using TF-IDF vector
+    embeddings and cosine similarity - finds projects whose free-text
+    description overlaps with the query, not just exact type/size matches
+    (see get_comparable_projects for that). Useful for fuzzier queries like
+    "a congested urban commercial site with unreliable suppliers".
+
+    Note: TF-IDF is a classical (term-overlap) vector embedding, not a deep
+    neural embedding - it won't catch paraphrases with no shared vocabulary.
+    """
+    from sklearn.metrics.pairwise import cosine_similarity
+
+    bundle = _load_embeddings()
+    vectorizer = bundle["vectorizer"]
+    tfidf_matrix = bundle["tfidf_matrix"]
+    metadata = bundle["metadata"]
+    descriptions = bundle["descriptions"]
+
+    query_vec = vectorizer.transform([query_text])
+    sims = cosine_similarity(query_vec, tfidf_matrix).flatten()
+
+    top_idx = sims.argsort()[::-1][:top_k]
+    results = []
+    for i in top_idx:
+        if sims[i] <= 0:
+            continue
+        row = dict(metadata[i])
+        row["similarity_score"] = round(float(sims[i]), 3)
+        row["description"] = descriptions[i]
+        results.append(row)
+    return results
