@@ -17,6 +17,23 @@ formal ML + agentic layer on top of that same kind of data: instead of static
 dashboards, an LLM (Claude) decides which tools to call - a risk model, comparables,
 cost estimates, supplier stats - based on the actual question a project manager asks.
 
+## Two retrieval-grounding pathways (and how they differ)
+
+This project has **two distinct ways** the LLM gets grounded in retrieved data - worth
+understanding the difference rather than conflating them:
+
+1. **Agentic tool-use** (`services/agent.py`) - the model decides *whether and when* to
+   call `find_similar_projects_semantic` (or other tools) as part of a multi-step reasoning
+   loop, observes the tool result, and can call more tools before answering.
+2. **RAG** (`services/rag.py`) - retrieval happens *first*, unconditionally, and the
+   retrieved context is injected directly into a single prompt before one generation call -
+   no loop, no tool-use, the classic retrieve-then-generate shape.
+
+Both reuse the same underlying TF-IDF vector embeddings (`ml/build_embeddings.py`); they
+differ only in *how* retrieval connects to generation. `build_rag_context()` in `rag.py`
+has no API dependency and is fully unit-testable offline; `answer_with_rag()` wraps it
+with a live Claude call.
+
 ## Architecture
 
 ```
@@ -25,7 +42,7 @@ User query ("Should we bid on this 3000 sqm commercial project?")
         ▼
   services/agent.py  ── Claude tool-use loop (the agentic layer)
         │
-        ├── predict_risk ──────────► services/risk_service.py (FastAPI)
+        ├── predict_risk ─────────► services/risk_service.py (FastAPI)
         │                                    │
         │                                    ▼
         │                            ml/train_model.py (TensorFlow multi-output model:
@@ -50,6 +67,7 @@ tool-use loop (see `run_agent()` in `services/agent.py`), not a fixed pipeline.
 |---|---|
 | TensorFlow | `ml/train_model.py` - a Keras multi-output regression model predicting cost overrun % and delay days |
 | LLM / Agentic AI | `services/agent.py` - Claude's tool-use API, no framework (LangChain etc.) needed |
+| RAG | `services/rag.py` - retrieve-then-generate pathway, separate from the agent's tool-use loop |
 | CI/CD pipeline | `.github/workflows/ci-cd.yml` - test -> train -> **model quality gate** -> Docker build -> push -> deploy |
 | Python | FastAPI (`services/risk_service.py`), plain Python tools (`services/tools.py`) |
 
@@ -109,10 +127,3 @@ CSV `ml/train_model.py` reads from - the training and serving code doesn't chang
   <img width="1572" height="276" alt="image" src="https://github.com/user-attachments/assets/9d3df1bb-a9ac-4939-b48c-f7254940e624" />
   <img width="1576" height="262" alt="image" src="https://github.com/user-attachments/assets/e45ba6a9-621f-4733-9ff9-251cecc90494" />
   <img width="1866" height="527" alt="image" src="https://github.com/user-attachments/assets/683d7214-93e2-4f65-925d-80749214da66" />
-  
-
-  
-
-
-  
-
